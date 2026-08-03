@@ -12,7 +12,6 @@
 <meta name="apple-mobile-web-app-title" content="Combat Tracker">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -20,6 +19,7 @@
     --bg: #1c1712; --bg-panel: #262019; --bg-card: #2e2620; --line: #4a3d2e;
     --gold: #c9a227; --gold-dim: #8a6c14; --maroon: #8b2635; --maroon-dim: #5c1a24;
     --cream: #ede6d6; --cream-dim: #b8ad97; --ally: #4a9c78; --ally-dim: #2e6b52;
+    --cond: #6b8fb0; --cond-dim: #3d5b74;
   }
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body{ margin:0; background: var(--bg); color: var(--cream); font-family:'Inter',system-ui,sans-serif; min-height:100vh; padding-bottom: 50px; }
@@ -49,15 +49,27 @@
   .icon-btn.danger{ border-color: var(--maroon-dim); color:#d99; }
 
   main{ max-width:640px; margin:0 auto; padding: 10px 14px 0; }
-  .toolbar{ display:flex; justify-content:space-between; align-items:center; margin:10px 2px 12px; gap:8px; }
+  .toolbar{ display:flex; justify-content:space-between; align-items:center; margin:10px 2px 6px; gap:8px; flex-wrap:wrap; }
   .toolbar h2{ font-family:'Cinzel',serif; font-size:.92rem; color:var(--cream-dim); margin:0; font-weight:600; }
-  .toolbar-btns{ display:flex; gap:6px; }
+  .toolbar-btns{ display:flex; gap:6px; flex-wrap:wrap; }
   .small-btn{ background:none; border:1px solid var(--line); color:var(--cream-dim); padding:5px 9px;
     border-radius:8px; font-size:.68rem; cursor:pointer; }
+  .small-btn.gold{ border-color: var(--gold-dim); color: var(--gold); }
 
-  .card{ background:var(--bg-card); border:1px solid var(--line); border-radius:12px; padding:12px 14px 14px; margin-bottom:12px; transition:opacity .3s; }
-  .card.downed{ opacity:.45; }
-  .card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .combat-banner{ display:flex; justify-content:space-between; align-items:center; background: var(--bg-panel);
+    border:1px solid var(--gold-dim); border-radius:10px; padding:9px 12px; margin: 4px 2px 14px; }
+  .combat-banner .r{ font-family:'Cinzel',serif; color:var(--gold); font-size:.85rem; font-weight:600; }
+  .combat-banner .t{ font-size:.75rem; color:var(--cream-dim); }
+  .next-turn-btn{ background: var(--gold-dim); border:none; color:#1c1712; font-weight:700; border-radius:8px; padding:6px 12px; font-size:.72rem; cursor:pointer; }
+
+  .card{ background:var(--bg-card); border:1px solid var(--line); border-radius:12px; padding:12px 14px 14px; margin-bottom:12px; transition:opacity .3s, box-shadow .2s; }
+  .card.downed{ opacity:.5; }
+  .card.current-turn{ border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,162,39,.35); }
+  .card-top{ display:flex; align-items:flex-start; gap:8px; }
+  .init-badge{ flex:0 0 auto; width:34px; height:34px; border-radius:8px; background:var(--bg-panel);
+    border:1px solid var(--line); color:var(--gold); text-align:center; font-family:'Cinzel',serif; font-weight:700;
+    font-size:.85rem; padding:0; }
+  .init-badge:focus{ outline:none; border-color: var(--gold-dim); }
   .name-wrap{ flex:1; min-width:0; }
   .name{ font-family:'Cinzel',serif; font-size:.98rem; font-weight:600; color:var(--cream); background:transparent; border:none; width:100%; padding:0; }
   .name:focus{ outline:none; border-bottom:1px solid var(--gold-dim); }
@@ -65,9 +77,18 @@
   .type-badge{ font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.3px; padding:1px 6px; border-radius:5px; }
   .type-badge.enemy{ color:#e8b3bd; background: rgba(139,38,53,.35); }
   .type-badge.ally{ color:#bfe8d3; background: rgba(74,156,120,.3); }
+  .ac-badge{ font-size:.68rem; color:var(--cream-dim); display:flex; align-items:center; gap:3px; }
+  .ac-badge input{ width:32px; background:transparent; border:none; border-bottom:1px dotted var(--line); color:var(--cream-dim); font-size:.68rem; padding:0; }
   .note-text{ font-size:.68rem; color:var(--cream-dim); font-style:italic; }
   .card-actions{ display:flex; gap:4px; flex-shrink:0; }
   .mini-btn{ background:none; border:none; color:var(--cream-dim); font-size:.95rem; cursor:pointer; padding:2px 5px; line-height:1; }
+
+  .cond-row{ display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:8px; }
+  .cond-chip{ display:flex; align-items:center; gap:4px; background: rgba(107,143,176,.18); color:var(--cond);
+    border:1px solid var(--cond-dim); border-radius:999px; padding:2px 8px; font-size:.66rem; font-weight:600; }
+  .cond-chip button{ background:none; border:none; color:var(--cond); font-size:.75rem; cursor:pointer; padding:0; line-height:1; }
+  .cond-select{ background:var(--bg-panel); border:1px dashed var(--line); color:var(--cream-dim); border-radius:999px;
+    padding:2px 8px; font-size:.66rem; }
 
   .hp-row{ display:flex; align-items:center; gap:10px; margin-top:10px; }
   .hp-bar-wrap{ flex:1; height:16px; border-radius:8px; background:#14100c; border:1px solid var(--line); position:relative; overflow:hidden; }
@@ -81,6 +102,15 @@
   .num-input{ width:50px; text-align:center; background:var(--bg-panel); border:1px solid var(--line); color:var(--cream); border-radius:8px; padding:7px 4px; font-size:.78rem; }
   .apply-btn{ border:1px solid var(--gold-dim); background:transparent; color:var(--gold); border-radius:8px; padding:7px 12px; font-size:.76rem; font-weight:700; cursor:pointer; }
 
+  .death-row{ margin-top:10px; background: rgba(139,38,53,.1); border:1px solid var(--maroon-dim); border-radius:8px; padding:8px 10px; }
+  .death-row .lbl{ font-size:.68rem; color:var(--cream-dim); margin-bottom:5px; text-transform:uppercase; letter-spacing:.3px; }
+  .death-group{ display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .death-group span.tag{ font-size:.68rem; width:56px; color:var(--cream-dim); }
+  .death-dot{ width:18px; height:18px; border-radius:50%; border:1.5px solid var(--line); background:transparent; cursor:pointer; padding:0; }
+  .death-dot.success.filled{ background: var(--ally); border-color: var(--ally); }
+  .death-dot.failure.filled{ background: var(--maroon); border-color: var(--maroon); }
+  .death-status{ font-size:.72rem; font-weight:700; margin-left:4px; }
+
   .add-panel{ background: var(--bg-panel); border:1px solid var(--line); border-radius:12px; padding:12px; margin: 6px 0 20px; }
   .add-panel-title{ font-size:.72rem; color:var(--cream-dim); margin-bottom:8px; text-transform:uppercase; letter-spacing:.4px; }
   .type-toggle{ display:flex; gap:6px; margin-bottom:8px; }
@@ -90,8 +120,10 @@
   .add-form{ display:flex; gap:8px; flex-wrap:wrap; }
   .add-form input{ background:var(--bg-card); border:1px solid var(--line); color:var(--cream); border-radius:8px; padding:9px 10px; font-size:.8rem; }
   .add-form input[name="ename"]{ flex:1 1 120px; }
-  .add-form input[name="enote"]{ flex:1 1 100px; }
-  .add-form input[name="ehp"]{ width:64px; }
+  .add-form input[name="enote"]{ flex:1 1 90px; }
+  .add-form input[name="ehp"]{ width:60px; }
+  .add-form input[name="eac"]{ width:56px; }
+  .add-form input[name="einit"]{ width:56px; }
   .add-btn{ background:var(--gold-dim); border:none; color:#1c1712; font-weight:700; border-radius:8px; padding:9px 16px; font-size:.8rem; cursor:pointer; width:100%; margin-top:8px; }
 
   .empty{ text-align:center; color:var(--cream-dim); font-style:italic; padding:26px 10px; font-size:.85rem; }
@@ -118,17 +150,20 @@
     <h2 id="listTitle"></h2>
     <div class="toolbar-btns" id="toolbarBtns"></div>
   </div>
+  <div id="combatBanner"></div>
   <div id="cardList"></div>
   <div class="add-panel">
     <div class="add-panel-title">Add combatant</div>
     <div class="type-toggle" id="typeToggle">
-      <button class="sel enemy" data-type="enemy">Enemy</button>
+      <button class="sel" data-type="enemy">Enemy</button>
       <button data-type="ally">Ally</button>
     </div>
     <div class="add-form">
       <input type="text" name="ename" id="newName" placeholder="Name">
-      <input type="text" name="enote" id="newNote" placeholder="Note (optional)">
+      <input type="text" name="enote" id="newNote" placeholder="Note">
       <input type="number" name="ehp" id="newHp" placeholder="Max HP" min="1">
+      <input type="number" name="eac" id="newAc" placeholder="AC">
+      <input type="number" name="einit" id="newInit" placeholder="Init">
     </div>
     <button class="add-btn" id="addBtn">Add</button>
   </div>
@@ -141,67 +176,93 @@
 </main>
 
 <script>
+const CONDITIONS = ["Blinded","Charmed","Concentrating","Deafened","Exhaustion","Frightened","Grappled",
+  "Incapacitated","Invisible","Paralyzed","Petrified","Poisoned","Prone","Restrained","Stunned","Unconscious"];
+
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
+function mk(name, type, note, maxHp, ac){
+  return { id: uid(), name, type, note, maxHp, currentHp: maxHp, ac: ac || null, initiative: null,
+    conditions: [], deathSuccesses: 0, deathFailures: 0 };
+}
+function freshCombat(){ return { inCombat: false, round: 1, currentIndex: 0 }; }
+
 function defaultGraciousKing(){
-  const mk = (name, type, note, maxHp) => ({ id: uid(), name, type, note, maxHp, currentHp: maxHp });
-  const enc = (name, list) => ({ id: uid(), name, combatants: list });
+  const enc = (name, list) => ({ id: uid(), name, combatants: list, combat: freshCombat() });
   return {
     id: uid(), name: "The Gracious King", activeTab: "party",
-    party: [],
+    party: [], partyCombat: freshCombat(),
     encounters: [
       enc("5.1 Vaultmarket", [
-        mk("Vaultwarden Sera","enemy","Elite",78),
-        mk("Warden A","enemy","Minion",33), mk("Warden B","enemy","Minion",33),
-        mk("Skirmisher A","enemy","Minion",22), mk("Skirmisher B","enemy","Minion",22), mk("Skirmisher C","enemy","Minion",22),
-        mk("Husk Skirmisher A","enemy","Husk — arrives later",18), mk("Husk Skirmisher B","enemy","Husk — arrives later",18),
+        mk("Vaultwarden Sera","enemy","Elite",78,16),
+        mk("Warden A","enemy","Minion",33,15), mk("Warden B","enemy","Minion",33,15),
+        mk("Skirmisher A","enemy","Minion",22,14), mk("Skirmisher B","enemy","Minion",22,14), mk("Skirmisher C","enemy","Minion",22,14),
+        mk("Husk Skirmisher A","enemy","Husk — arrives later",18,13), mk("Husk Skirmisher B","enemy","Husk — arrives later",18,13),
       ]),
       enc("5.2 Root Hollow", [
-        mk("Grovemother Yssa","enemy","Elite",90),
-        mk("Skirmisher A","enemy","Minion",22), mk("Skirmisher B","enemy","Minion",22),
-        mk("Warden A","enemy","Minion",33), mk("Warden B","enemy","Minion",33),
-        mk("Husk Elder","enemy","Husk — arrives later",55),
+        mk("Grovemother Yssa","enemy","Elite",90,15),
+        mk("Skirmisher A","enemy","Minion",22,14), mk("Skirmisher B","enemy","Minion",22,14),
+        mk("Warden A","enemy","Minion",33,15), mk("Warden B","enemy","Minion",33,15),
+        mk("Husk Elder","enemy","Husk — arrives later",55,15),
       ]),
       enc("5.3 Forgeworks", [
-        mk("Forge Marshal Brenn","enemy","Elite",95),
-        mk("Warden A","enemy","Minion",33), mk("Warden B","enemy","Minion",33),
-        mk("Warden C","enemy","Minion",33), mk("Warden D","enemy","Minion",33),
-        mk("Husk Warden A","enemy","Husk — arrives later",28), mk("Husk Warden B","enemy","Husk — arrives later",28),
+        mk("Forge Marshal Brenn","enemy","Elite",95,17),
+        mk("Warden A","enemy","Minion",33,15), mk("Warden B","enemy","Minion",33,15),
+        mk("Warden C","enemy","Minion",33,15), mk("Warden D","enemy","Minion",33,15),
+        mk("Husk Warden A","enemy","Husk — arrives later",28,14), mk("Husk Warden B","enemy","Husk — arrives later",28,14),
       ]),
       enc("5.4 Elderwood Canopy", [
-        mk("Elder Strider Faelan","enemy","Elite",82),
-        mk("Skirmisher A","enemy","Minion",22), mk("Skirmisher B","enemy","Minion",22), mk("Skirmisher C","enemy","Minion",22),
-        mk("Husk Skirmisher A","enemy","Husk — arrives later",18), mk("Husk Skirmisher B","enemy","Husk — arrives later",18),
+        mk("Elder Strider Faelan","enemy","Elite",82,16),
+        mk("Skirmisher A","enemy","Minion",22,14), mk("Skirmisher B","enemy","Minion",22,14), mk("Skirmisher C","enemy","Minion",22,14),
+        mk("Husk Skirmisher A","enemy","Husk — arrives later",18,13), mk("Husk Skirmisher B","enemy","Husk — arrives later",18,13),
       ]),
       enc("5.5 Twin Banner Garrison", [
-        mk("Champion Korrin","enemy","Elite",100),
-        mk("Warden A","enemy","Minion",33), mk("Warden B","enemy","Minion",33),
-        mk("Warden C","enemy","Minion",33), mk("Warden D","enemy","Minion",33),
-        mk("Husk Warden A","enemy","Husk — arrives later",28), mk("Husk Warden B","enemy","Husk — arrives later",28),
+        mk("Champion Korrin","enemy","Elite",100,18),
+        mk("Warden A","enemy","Minion",33,15), mk("Warden B","enemy","Minion",33,15),
+        mk("Warden C","enemy","Minion",33,15), mk("Warden D","enemy","Minion",33,15),
+        mk("Husk Warden A","enemy","Husk — arrives later",28,14), mk("Husk Warden B","enemy","Husk — arrives later",28,14),
       ]),
       enc("5.6 Hush Archive", [
-        mk("Archivist Thessaly","enemy","Elite",85),
-        mk("Adept A","enemy","Minion",40), mk("Adept B","enemy","Minion",40), mk("Adept C","enemy","Minion",40),
-        mk("Husk Skirmisher A","enemy","Husk — arrives later",18), mk("Husk Skirmisher B","enemy","Husk — arrives later",18),
+        mk("Archivist Thessaly","enemy","Elite",85,15),
+        mk("Adept A","enemy","Minion",40,13), mk("Adept B","enemy","Minion",40,13), mk("Adept C","enemy","Minion",40,13),
+        mk("Husk Skirmisher A","enemy","Husk — arrives later",18,13), mk("Husk Skirmisher B","enemy","Husk — arrives later",18,13),
       ]),
       enc("7.0 Throne Room", [
-        mk("Malvorric, the Hollow Crown","enemy","Boss",180),
-        mk("King Vaelith","ally","",45), mk("Queen Borga","ally","",45),
+        mk("Malvorric, the Hollow Crown","enemy","Boss",180,18),
+        mk("King Vaelith","ally","",45,15), mk("Queen Borga","ally","",45,15),
       ]),
     ],
   };
 }
 
-const STORAGE_KEY = "dnd-combat-tracker-v1";
+const STORAGE_KEY = "dnd-combat-tracker-v2";
 let state = null;
 
 function loadState(){
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return migrateState(JSON.parse(raw));
   } catch(e) { setStatus("Storage unavailable — changes won't be saved this session."); }
   const gk = defaultGraciousKing();
   return { sessions: [gk], activeSessionId: gk.id };
+}
+function migrateState(s){
+  s.sessions.forEach(sess => {
+    if (!sess.partyCombat) sess.partyCombat = freshCombat();
+    sess.party.forEach(fillCombatant);
+    sess.encounters.forEach(enc => {
+      if (!enc.combat) enc.combat = freshCombat();
+      enc.combatants.forEach(fillCombatant);
+    });
+  });
+  return s;
+}
+function fillCombatant(c){
+  if (c.ac === undefined) c.ac = null;
+  if (c.initiative === undefined) c.initiative = null;
+  if (!c.conditions) c.conditions = [];
+  if (c.deathSuccesses === undefined) c.deathSuccesses = 0;
+  if (c.deathFailures === undefined) c.deathFailures = 0;
 }
 function saveState(){
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -222,6 +283,10 @@ function activeList(session){
 function activeEncounter(session){
   if (session.activeTab === "party") return null;
   return session.encounters.find(e => e.id === session.activeTab);
+}
+function activeCombat(session){
+  const enc = activeEncounter(session);
+  return enc ? enc.combat : session.partyCombat;
 }
 
 function renderAll(){
@@ -247,7 +312,7 @@ function renderSessionBar(){
   add.onclick = () => {
     const name = prompt("Name this session (e.g. a campaign or game name):");
     if (!name) return;
-    const s = { id: uid(), name: name.trim(), activeTab: "party", party: [], encounters: [] };
+    const s = { id: uid(), name: name.trim(), activeTab: "party", party: [], partyCombat: freshCombat(), encounters: [] };
     state.sessions.push(s);
     state.activeSessionId = s.id;
     saveState(); renderAll();
@@ -298,7 +363,7 @@ function renderSubtabBar(){
   add.onclick = () => {
     const name = prompt("Name this encounter:");
     if (!name) return;
-    const enc = { id: uid(), name: name.trim(), combatants: [] };
+    const enc = { id: uid(), name: name.trim(), combatants: [], combat: freshCombat() };
     s.encounters.push(enc);
     s.activeTab = enc.id;
     saveState(); renderSubtabBar(); renderList();
@@ -313,19 +378,65 @@ function hpColor(pct){
 }
 function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
+function renderCombatBanner(){
+  const s = activeSession();
+  const combat = activeCombat(s);
+  const list = activeList(s);
+  const wrap = document.getElementById("combatBanner");
+  wrap.innerHTML = "";
+  if (!combat.inCombat) return;
+  const current = list[combat.currentIndex];
+  const div = document.createElement("div");
+  div.className = "combat-banner";
+  div.innerHTML = `
+    <div>
+      <div class="r">Round ${combat.round}</div>
+      <div class="t">${current ? "Current turn: " + escapeHtml(current.name) : "No combatants"}</div>
+    </div>
+  `;
+  const btn = document.createElement("button");
+  btn.className = "next-turn-btn";
+  btn.textContent = "Next turn ▶";
+  btn.onclick = () => {
+    if (list.length === 0) return;
+    combat.currentIndex++;
+    if (combat.currentIndex >= list.length){ combat.currentIndex = 0; combat.round++; }
+    saveState(); renderList();
+  };
+  div.appendChild(btn);
+  wrap.appendChild(div);
+}
+
 function renderList(){
   const s = activeSession();
   const enc = activeEncounter(s);
+  const combat = activeCombat(s);
   const isParty = s.activeTab === "party";
   document.getElementById("listTitle").textContent = isParty ? "Party" : enc.name;
 
   const toolbarBtns = document.getElementById("toolbarBtns");
   toolbarBtns.innerHTML = "";
+
+  const combatBtn = document.createElement("button");
+  combatBtn.className = "small-btn gold";
+  combatBtn.textContent = combat.inCombat ? "End combat" : "Start combat (sort by initiative)";
+  combatBtn.onclick = () => {
+    const list = activeList(s);
+    if (!combat.inCombat){
+      list.sort((a,b) => (b.initiative ?? -999) - (a.initiative ?? -999));
+      combat.inCombat = true; combat.round = 1; combat.currentIndex = 0;
+    } else {
+      combat.inCombat = false;
+    }
+    saveState(); renderList();
+  };
+  toolbarBtns.appendChild(combatBtn);
+
   const healAllBtn = document.createElement("button");
   healAllBtn.className = "small-btn";
   healAllBtn.textContent = "Heal all";
   healAllBtn.onclick = () => {
-    activeList(s).forEach(c => c.currentHp = c.maxHp);
+    activeList(s).forEach(c => { c.currentHp = c.maxHp; c.deathSuccesses = 0; c.deathFailures = 0; });
     saveState(); renderList();
   };
   toolbarBtns.appendChild(healAllBtn);
@@ -335,7 +446,7 @@ function renderList(){
     clearBtn.textContent = "Clear all";
     clearBtn.onclick = () => {
       if (!confirm("Remove every combatant from this encounter?")) return;
-      enc.combatants = [];
+      enc.combatants = []; combat.inCombat = false;
       saveState(); renderList();
     };
     toolbarBtns.appendChild(clearBtn);
@@ -351,6 +462,8 @@ function renderList(){
     toolbarBtns.appendChild(delEncBtn);
   }
 
+  renderCombatBanner();
+
   const list = activeList(s);
   const wrap = document.getElementById("cardList");
   wrap.innerHTML = "";
@@ -361,16 +474,47 @@ function renderList(){
     wrap.appendChild(d);
     return;
   }
-  list.forEach(entry => {
+  list.forEach((entry, idx) => {
     const pct = Math.max(0, entry.currentHp / entry.maxHp);
+    const isCurrentTurn = combat.inCombat && idx === combat.currentIndex;
     const card = document.createElement("div");
-    card.className = "card" + (entry.currentHp <= 0 ? " downed" : "");
+    card.className = "card" + (entry.currentHp <= 0 ? " downed" : "") + (isCurrentTurn ? " current-turn" : "");
+
+    const condChips = entry.conditions.map(c =>
+      `<span class="cond-chip">${escapeHtml(c)}<button data-id="${entry.id}" data-action="rmcond" data-cond="${escapeHtml(c)}">✕</button></span>`
+    ).join("");
+    const condOptions = CONDITIONS.filter(c => !entry.conditions.includes(c))
+      .map(c => `<option value="${c}">${c}</option>`).join("");
+
+    const isDownedAlly = entry.type === "ally" && entry.currentHp <= 0;
+    let deathHtml = "";
+    if (isDownedAlly){
+      const dots = (kind, count) => {
+        let out = "";
+        for (let i = 0; i < 3; i++){
+          out += `<button class="death-dot ${kind} ${i < count ? "filled" : ""}" data-id="${entry.id}" data-kind="${kind}" data-idx="${i}"></button>`;
+        }
+        return out;
+      };
+      let statusTxt = "";
+      if (entry.deathSuccesses >= 3) statusTxt = `<span class="death-status" style="color:var(--ally)">Stable</span>`;
+      else if (entry.deathFailures >= 3) statusTxt = `<span class="death-status" style="color:var(--maroon)">Dead</span>`;
+      deathHtml = `
+        <div class="death-row">
+          <div class="lbl">Death saves</div>
+          <div class="death-group"><span class="tag">Success</span>${dots("success", entry.deathSuccesses)}${statusTxt.includes("Stable")?statusTxt:""}</div>
+          <div class="death-group"><span class="tag">Failure</span>${dots("failure", entry.deathFailures)}${statusTxt.includes("Dead")?statusTxt:""}</div>
+        </div>`;
+    }
+
     card.innerHTML = `
       <div class="card-top">
+        <input class="init-badge" type="number" value="${entry.initiative ?? ""}" placeholder="—" data-id="${entry.id}" data-field="initiative" title="Initiative">
         <div class="name-wrap">
           <input class="name" value="${escapeHtml(entry.name)}" data-id="${entry.id}" data-field="name">
           <div class="badge-row">
             <span class="type-badge ${entry.type}">${entry.type === "ally" ? "Ally" : "Enemy"}</span>
+            <span class="ac-badge">AC <input type="number" value="${entry.ac ?? ""}" data-id="${entry.id}" data-field="ac"></span>
             ${entry.note ? `<span class="note-text">${escapeHtml(entry.note)}</span>` : ""}
           </div>
         </div>
@@ -378,6 +522,13 @@ function renderList(){
           <button class="mini-btn" data-id="${entry.id}" data-action="dup" title="Duplicate">⧉</button>
           <button class="mini-btn" data-id="${entry.id}" data-action="remove" title="Remove">✕</button>
         </div>
+      </div>
+      <div class="cond-row">
+        ${condChips}
+        <select class="cond-select" data-id="${entry.id}" data-field="addcond">
+          <option value="">+ Condition</option>
+          ${condOptions}
+        </select>
       </div>
       <div class="hp-row">
         <div class="hp-bar-wrap">
@@ -394,6 +545,7 @@ function renderList(){
         <button class="apply-btn" data-id="${entry.id}" data-action="applydmg">Apply</button>
         <button class="dmg-btn heal-btn" data-id="${entry.id}" data-action="heal5">+5</button>
       </div>
+      ${deathHtml}
     `;
     wrap.appendChild(card);
   });
@@ -411,24 +563,38 @@ document.getElementById("cardList").addEventListener("click", (e) => {
   if (action === "remove"){
     const idx = list.indexOf(entry); list.splice(idx,1);
   } else if (action === "dup"){
-    list.push({ id: uid(), name: entry.name + " (copy)", type: entry.type, note: entry.note, maxHp: entry.maxHp, currentHp: entry.maxHp });
+    const copy = { ...entry, id: uid(), name: entry.name + " (copy)", conditions: [...entry.conditions] };
+    list.push(copy);
   } else if (action === "dmg1"){ entry.currentHp = Math.max(0, entry.currentHp - 1); }
   else if (action === "dmg5"){ entry.currentHp = Math.max(0, entry.currentHp - 5); }
   else if (action === "dmg10"){ entry.currentHp = Math.max(0, entry.currentHp - 10); }
-  else if (action === "heal5"){ entry.currentHp = Math.min(entry.maxHp, entry.currentHp + 5); }
+  else if (action === "heal5"){ entry.currentHp = Math.min(entry.maxHp, entry.currentHp + 5); if (entry.currentHp > 0){ entry.deathSuccesses=0; entry.deathFailures=0; } }
   else if (action === "applydmg"){
     const input = document.getElementById("dmg-input-" + id);
     const val = parseInt(input.value);
     if (!isNaN(val)){ entry.currentHp = Math.max(0, Math.min(entry.maxHp, entry.currentHp - val)); input.value = ""; }
+  } else if (action === "rmcond"){
+    entry.conditions = entry.conditions.filter(c => c !== btn.dataset.cond);
+  } else if (btn.classList.contains("death-dot")){
+    const kind = btn.dataset.kind; const i = parseInt(btn.dataset.idx);
+    const key = kind === "success" ? "deathSuccesses" : "deathFailures";
+    entry[key] = (entry[key] === i + 1) ? i : i + 1;
   }
   saveState(); renderList();
 });
 
 document.getElementById("cardList").addEventListener("change", (e) => {
-  if (e.target.dataset.field === "name"){
-    const s = activeSession();
-    const entry = activeList(s).find(x => x.id === e.target.dataset.id);
-    if (entry){ entry.name = e.target.value || entry.name; saveState(); }
+  const s = activeSession();
+  const entry = activeList(s).find(x => x.id === e.target.dataset.id);
+  if (!entry) return;
+  const field = e.target.dataset.field;
+  if (field === "name"){ entry.name = e.target.value || entry.name; saveState(); }
+  else if (field === "ac"){ const v = parseInt(e.target.value); entry.ac = isNaN(v) ? null : v; saveState(); }
+  else if (field === "initiative"){ const v = parseInt(e.target.value); entry.initiative = isNaN(v) ? null : v; saveState(); }
+  else if (field === "addcond"){
+    const val = e.target.value;
+    if (val && !entry.conditions.includes(val)) entry.conditions.push(val);
+    saveState(); renderList();
   }
 });
 
@@ -447,12 +613,18 @@ document.getElementById("addBtn").addEventListener("click", () => {
   const nameInput = document.getElementById("newName");
   const noteInput = document.getElementById("newNote");
   const hpInput = document.getElementById("newHp");
+  const acInput = document.getElementById("newAc");
+  const initInput = document.getElementById("newInit");
   const name = nameInput.value.trim();
   const note = noteInput.value.trim();
   const hp = parseInt(hpInput.value);
+  const ac = parseInt(acInput.value);
+  const init = parseInt(initInput.value);
   if (!name || isNaN(hp) || hp <= 0){ setStatus("Enter a name and a max HP above 0."); return; }
-  list.push({ id: uid(), name, type: selectedType, note, maxHp: hp, currentHp: hp });
-  nameInput.value = ""; noteInput.value = ""; hpInput.value = "";
+  const entry = mk(name, selectedType, note, hp, isNaN(ac) ? null : ac);
+  if (!isNaN(init)) entry.initiative = init;
+  list.push(entry);
+  nameInput.value = ""; noteInput.value = ""; hpInput.value = ""; acInput.value = ""; initInput.value = "";
   saveState(); renderList();
 });
 
@@ -475,7 +647,7 @@ document.getElementById("importFile").addEventListener("change", (e) => {
       const parsed = JSON.parse(reader.result);
       if (!parsed.sessions || !Array.isArray(parsed.sessions)) throw new Error("bad format");
       if (!confirm("Import this backup? It will replace everything currently in the tracker.")) return;
-      state = parsed;
+      state = migrateState(parsed);
       saveState(); renderAll();
       setStatus("Backup imported.");
     } catch(err){ setStatus("That file doesn't look like a valid backup."); }

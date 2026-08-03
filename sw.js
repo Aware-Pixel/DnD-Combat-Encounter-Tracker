@@ -1,4 +1,4 @@
-const CACHE_NAME = "combat-tracker-v1";
+const CACHE_NAME = "combat-tracker-v2";
 const ASSETS = [
   "./dm_combat_tracker_standalone.html",
   "./manifest.json",
